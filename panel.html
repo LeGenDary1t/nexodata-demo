@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexodata · Panel administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #eef1f7;
+    --surface: #ffffff;
+    --surface-2: #f7f9fc;
+    --text: #0b1220;
+    --muted: #5b6678;
+    --faint: #8a94a6;
+    --border: #e1e6ef;
+    --sidebar: #0c1326;
+    --sidebar-text: #aeb9d4;
+    --sidebar-active: #1b2744;
+    --primary: #2f55e4;
+    --c1: #2f55e4;
+    --c2: #12b5a5;
+    --c3: #f5a623;
+    --c4: #8b5cf6;
+    --c5: #ef5a5a;
+    --up: #0f9f6e;
+    --down: #e0564f;
+    --grid: #eceff5;
+    --warn-bg: #fff6e6;
+    --warn-border: #f0cf8f;
+    --warn-text: #8a5a00;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0e18; --surface: #121826; --surface-2: #0f1522;
+      --text: #e6eaf2; --muted: #94a0b4; --faint: #6b7688;
+      --border: #222c40; --sidebar: #0a0f1c; --sidebar-text: #8794b0;
+      --sidebar-active: #18233c; --primary: #4c6ef5;
+      --c1: #5b7cf7; --c2: #3fd3c2; --c3: #f7ba53; --c4: #a78bfa; --c5: #f4746f;
+      --up: #3ad29a; --down: #f0756e; --grid: #1c2740;
+      --warn-bg: #2a2109; --warn-border: #5c4a16; --warn-text: #f5c66b;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0e18; --surface: #121826; --surface-2: #0f1522;
+    --text: #e6eaf2; --muted: #94a0b4; --faint: #6b7688;
+    --border: #222c40; --sidebar: #0a0f1c; --sidebar-text: #8794b0;
+    --sidebar-active: #18233c; --primary: #4c6ef5;
+    --c1: #5b7cf7; --c2: #3fd3c2; --c3: #f7ba53; --c4: #a78bfa; --c5: #f4746f;
+    --up: #3ad29a; --down: #f0756e; --grid: #1c2740;
+    --warn-bg: #2a2109; --warn-border: #5c4a16; --warn-text: #f5c66b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.55 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    background: var(--sidebar); color: var(--sidebar-text);
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 20px 14px; position: sticky; top: 0; height: 100vh;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; padding: 6px 8px 18px; color: #fff; font-weight: 700; font-size: 17px; }
+  .brand small { font-weight: 500; opacity: .55; margin-left: 2px; }
+  .nav-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #5e6b88; padding: 14px 10px 6px; }
+  .nav a {
+    display: flex; align-items: center; gap: 11px;
+    padding: 9px 11px; border-radius: 9px;
+    color: var(--sidebar-text); text-decoration: none; font-weight: 500; font-size: 13.5px;
+  }
+  .nav a svg { width: 18px; height: 18px; opacity: .85; flex: none; }
+  .nav a:hover { background: rgba(255, 255, 255, .05); color: #fff; }
+  .nav a.active { background: var(--sidebar-active); color: #fff; }
+  .nav a .tag { margin-left: auto; font-size: 11px; font-weight: 600; background: var(--c5); color: #fff; border-radius: 999px; padding: 1px 7px; }
+  .side-foot { margin-top: auto; padding: 12px 10px 0; font-size: 12px; color: #5e6b88; }
+
+  /* ---------- Main ---------- */
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 28px; background: var(--surface);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5;
+  }
+  .topbar h1 { font-size: 17px; margin: 0; letter-spacing: -.01em; }
+  .topbar .crumb { color: var(--faint); font-weight: 500; }
+  .search {
+    margin-left: 8px; flex: 1; max-width: 360px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 7px 11px; color: var(--faint);
+  }
+  .search svg { width: 16px; height: 16px; flex: none; }
+  .search input { border: 0; background: transparent; outline: none; color: var(--text); font: inherit; width: 100%; }
+  .top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted); cursor: pointer;
+    display: grid; place-items: center; position: relative;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--c5); border: 2px solid var(--surface); }
+  .user {
+    display: flex; align-items: center; gap: 10px; padding: 4px 6px 4px 4px;
+    border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; flex: none;
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px;
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+  }
+  .user .who { line-height: 1.15; }
+  .user .who b { font-size: 13px; }
+  .user .who span { display: block; font-size: 11.5px; color: var(--faint); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 38px; padding: 0 14px; border-radius: 9px;
+    font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn svg { width: 16px; height: 16px; }
+
+  .content { padding: 22px 28px 40px; display: flex; flex-direction: column; gap: 20px; }
+
+  .notice {
+    display: flex; gap: 11px; align-items: flex-start;
+    background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text);
+    border-radius: 12px; padding: 12px 15px; font-size: 13.5px;
+  }
+  .notice svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+  .notice b { font-weight: 700; }
+  .notice button { margin-left: auto; border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; opacity: .7; padding: 2px 6px; }
+  .notice button:hover { opacity: 1; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: var(--shadow);
+  }
+  .card .hd { display: flex; align-items: center; gap: 12px; padding: 16px 18px 0; }
+  .card .hd h2 { font-size: 14.5px; margin: 0; }
+  .card .hd .sub { font-size: 12.5px; color: var(--faint); margin-top: 2px; }
+  .card .hd .right { margin-left: auto; font-size: 12.5px; color: var(--faint); }
+  .card .bd { padding: 16px 18px 18px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .kpi { padding: 16px 18px; }
+  .kpi .top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12.5px; font-weight: 500; }
+  .kpi .ico { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; }
+  .kpi .ico svg { width: 16px; height: 16px; }
+  .kpi .val { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin: 10px 0 4px; }
+  .kpi .delta { font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+  .kpi .delta.up { color: var(--up); }
+  .kpi .delta.down { color: var(--down); }
+  .kpi .delta svg { width: 13px; height: 13px; }
+  .kpi .spark { margin-top: 12px; height: 34px; width: 100%; display: block; }
+
+  .grid-2 { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; }
+  .grid-2b { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
+
+  .chart { width: 100%; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 14px; }
+  .legend .it { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .legend b { color: var(--text); font-weight: 600; }
+
+  .bars { display: flex; flex-direction: column; gap: 13px; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 64px; align-items: center; gap: 12px; font-size: 13px; }
+  .bar-row .name { color: var(--muted); }
+  .bar-track { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .bar-row .amt { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; color: var(--faint); font-weight: 600; font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; padding: 0 12px 10px; }
+  tbody td { padding: 11px 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:hover { background: var(--surface-2); }
+  .cust { display: flex; align-items: center; gap: 10px; }
+  .cust .av { width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 11px; }
+  .cust .nm b { display: block; font-weight: 600; }
+  .cust .nm span { font-size: 12px; color: var(--faint); }
+  .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .pill { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .pill.ok { background: rgba(15, 159, 110, .12); color: var(--up); }
+  .pill.risk { background: rgba(239, 90, 90, .12); color: var(--down); }
+  .pill.mid { background: rgba(245, 166, 35, .14); color: #b5790a; }
+  .amt-pos { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .mask { letter-spacing: .06em; color: var(--muted); }
+
+  @media (max-width: 1000px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .grid-2, .grid-2b { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .search { display: none; }
+    .content { padding: 18px 16px 36px; }
+  }
+  @media (max-width: 520px) {
+    .kpis { grid-template-columns: 1fr; }
+    .user .who { display: none; }
+    .topbar { padding: 12px 16px; }
+    .table-wrap { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ---------- Sidebar ---------- -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4c6ef5"/><stop offset="1" stop-color="#12b5a5"/></linearGradient></defs>
+        <rect width="32" height="32" rx="8" fill="url(#g)"/>
+        <path d="M10 22V10l12 12V10" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="22" r="2.4" fill="#fff"/><circle cx="10" cy="10" r="2.4" fill="#fff"/>
+        <circle cx="22" cy="22" r="2.4" fill="#fff"/><circle cx="22" cy="10" r="2.4" fill="#fff"/>
+      </svg>
+      <span>Nexodata<small>S.A.</small></span>
+    </div>
+
+    <nav class="nav">
+      <a class="active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Resumen</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-6"/></svg> Finanzas</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M19 8v6M16 11h6"/></svg> Clientes</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg> Operaciones</a>
+      <div class="nav-label">Administración</div>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/></svg> Seguridad <span class="tag">3</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 6.7 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 4 13.4H4a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 5.6 6.7l-.1-.1A2 2 0 1 1 8.3 3.8l.1.1A1.6 1.6 0 0 0 11 2.9V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg> Configuración</a>
+    </nav>
+
+    <div class="side-foot">
+      Panel administrativo<br>v3.2.1 · build demo
+    </div>
+  </aside>
+
+  <!-- ---------- Main ---------- -->
+  <div class="main">
+    <header class="topbar">
+      <h1><span class="crumb">Inicio /</span> Resumen</h1>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Buscar clientes, facturas, reportes…" aria-label="Buscar">
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" title="Notificaciones" aria-label="Notificaciones"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+        <div class="user">
+          <div class="avatar" id="avatar">AD</div>
+          <div class="who"><b id="uname">Administrador</b><span>Acceso total</span></div>
+        </div>
+        <a class="btn" href="index.html" id="logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg> Salir</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="notice" id="notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.3 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/></svg>
+        <div><b>Simulación con fines educativos.</b> Todos los datos (clientes, montos, tarjetas, CUIT, ingresos) son <b>ficticios</b>. Esta pantalla muestra a qué información accede quien entra con una cuenta: por eso proteger las credenciales es crítico.</div>
+        <button id="close-notice" aria-label="Ocultar aviso">✕</button>
+      </div>
+
+      <!-- KPIs -->
+      <section class="kpis">
+        <div class="card kpi">
+          <div class="top">Ingresos del mes
+            <span class="ico" style="background:rgba(47,85,228,.12);color:var(--c1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          </div>
+          <div class="val">US$ 1,72 M</div>
+          <span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg> 10,3 % vs. mes anterior</span>
+          <svg class="spark" data-spark="820,910,880,1040,1180,1120,1260,1340,1290,1480,1560,1720" data-color="var(--c1)" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="card kpi">
+          <div class="top">Usuarios activos
+            <span class="ico" style="background:rgba(18,181,165,.14);color:var(--c2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M17 8a4 4 0 0 1 0 8"/></svg></span>
+          </div>
+          <div class="val">48.902</div>
+          <span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg> 4,8 %</span>
+          <svg class="spark" data-spark="38,39,41,40,43,44,46,45,47,47,48,49" data-color="var(--c2)" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="card kpi">
+          <div class="top">Tasa de conversión
+            <span class="ico" style="background:rgba(139,92,246,.14);color:var(--c4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></span>
+          </div>
+          <div class="val">3,94 %</div>
+          <span class="delta down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7 17 17M9 17h8V9"/></svg> 0,6 %</span>
+          <svg class="spark" data-spark="4.3,4.2,4.4,4.1,4.0,3.9,4.1,4.0,3.95,3.9,3.97,3.94" data-color="var(--c4)" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="card kpi">
+          <div class="top">MRR
+            <span class="ico" style="background:rgba(245,166,35,.16);color:#b5790a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
+          </div>
+          <div class="val">US$ 512 K</div>
+          <span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg> 6,1 %</span>
+          <svg class="spark" data-spark="390,405,410,430,455,460,478,482,495,500,508,512" data-color="var(--c3)" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
+        </div>
+      </section>
+
+      <!-- Ingresos + Planes -->
+      <section class="grid-2">
+        <div class="card">
+          <div class="hd">
+            <div><h2>Ingresos mensuales</h2><div class="sub">Facturación neta — ejercicio 2026 (en miles de US$)</div></div>
+            <div class="right">Total: <b style="color:var(--text)">US$ 14,6 M</b></div>
+          </div>
+          <div class="bd">
+            <svg id="revChart" class="chart" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfico de ingresos mensuales"></svg>
+            <div class="legend">
+              <span class="it"><span class="sw" style="background:var(--c1)"></span> 2026 <b id="lg-2026"></b></span>
+              <span class="it"><span class="sw" style="background:var(--faint)"></span> 2025</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="hd"><div><h2>Ingresos por plan</h2><div class="sub">Participación actual</div></div></div>
+          <div class="bd" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <svg id="donut" width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Distribución por plan"></svg>
+            <div class="legend" id="donut-legend" style="align-self:stretch;justify-content:center"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Regiones + Datos sensibles -->
+      <section class="grid-2b">
+        <div class="card">
+          <div class="hd"><div><h2>Ventas por región</h2><div class="sub">Últimos 30 días</div></div></div>
+          <div class="bd">
+            <div class="bars" id="regionBars"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="hd">
+            <div><h2>Cuentas de mayor facturación</h2><div class="sub">Información confidencial · datos ficticios</div></div>
+            <div class="right"><span class="pill risk">Acceso restringido</span></div>
+          </div>
+          <div class="bd table-wrap">
+            <table>
+              <thead>
+                <tr><th>Cliente</th><th>CUIT</th><th>Medio de pago</th><th>Facturación anual</th><th>Estado</th></tr>
+              </thead>
+              <tbody id="custBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (s, r = document) => r.querySelector(s);
+
+  /* ---------- Usuario ---------- */
+  (function () {
+    let name = 'Administrador';
+    try {
+      const u = new URLSearchParams(location.search).get('u');
+      if (u) name = u.replace(/[<>&]/g, '').slice(0, 40);
+    } catch (_) {}
+    $('#uname').textContent = name;
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    const initials = ((parts[0] ? parts[0][0] : 'A') + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    $('#avatar').textContent = initials.slice(0, 2) || 'AD';
+  })();
+
+  $('#close-notice').addEventListener('click', () => { $('#notice').style.display = 'none'; });
+
+  function cssVar(name) {
+    const m = name.match(/var\((--[\w-]+)\)/);
+    return m ? getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim() : name;
+  }
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  /* ---------- Sparklines ---------- */
+  document.querySelectorAll('.spark').forEach((svg) => {
+    const data = svg.dataset.spark.split(',').map(Number);
+    const color = cssVar(svg.dataset.color);
+    const W = 120, H = 34, p = 3;
+    const max = Math.max(...data), min = Math.min(...data);
+    const x = (i) => p + (i / (data.length - 1)) * (W - 2 * p);
+    const y = (v) => H - p - (max === min ? 0.5 : (v - min) / (max - min)) * (H - 2 * p);
+    const pts = data.map((v, i) => x(i) + ',' + y(v)).join(' ');
+    const area = 'M' + x(0) + ',' + H + ' L' + data.map((v, i) => x(i) + ',' + y(v)).join(' L') + ' L' + x(data.length - 1) + ',' + H + ' Z';
+    const gid = 'sg' + Math.random().toString(36).slice(2, 7);
+    const defs = el('defs', {});
+    const lg = el('linearGradient', { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 });
+    lg.appendChild(el('stop', { offset: '0', 'stop-color': color, 'stop-opacity': '.28' }));
+    lg.appendChild(el('stop', { offset: '1', 'stop-color': color, 'stop-opacity': '0' }));
+    defs.appendChild(lg); svg.appendChild(defs);
+    svg.appendChild(el('path', { d: area, fill: 'url(#' + gid + ')' }));
+    svg.appendChild(el('polyline', { points: pts, fill: 'none', stroke: color, 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  });
+
+  /* ---------- Gráfico de ingresos (2 series + grilla + ejes) ---------- */
+  (function () {
+    const svg = $('#revChart');
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const d2026 = [820, 910, 880, 1040, 1180, 1120, 1260, 1340, 1290, 1480, 1560, 1720];
+    const d2025 = [610, 660, 700, 720, 790, 830, 880, 910, 960, 1010, 1080, 1130];
+    const W = 640, H = 260, L = 46, R = 14, T = 16, B = 34;
+    const max = 1900, min = 0;
+    const x = (i) => L + (i / (months.length - 1)) * (W - L - R);
+    const y = (v) => T + (1 - (v - min) / (max - min)) * (H - T - B);
+    const grid = cssVar('var(--grid)'), faint = cssVar('var(--faint)');
+
+    [0, 475, 950, 1425, 1900].forEach((gv) => {
+      svg.appendChild(el('line', { x1: L, y1: y(gv), x2: W - R, y2: y(gv), stroke: grid, 'stroke-width': 1 }));
+      const t = el('text', { x: L - 8, y: y(gv) + 4, 'text-anchor': 'end', 'font-size': 10, fill: faint });
+      t.textContent = gv === 0 ? '0' : (gv / 1000).toFixed(gv % 1000 ? 2 : 1) + 'M';
+      svg.appendChild(t);
+    });
+    months.forEach((m, i) => {
+      const t = el('text', { x: x(i), y: H - 12, 'text-anchor': 'middle', 'font-size': 10, fill: faint });
+      t.textContent = m; svg.appendChild(t);
+    });
+
+    function series(data, color, width, fill) {
+      const line = 'M' + data.map((v, i) => x(i) + ',' + y(v)).join(' L');
+      if (fill) {
+        const gid = 'rg' + Math.random().toString(36).slice(2, 7);
+        const defs = el('defs', {});
+        const lg = el('linearGradient', { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 });
+        lg.appendChild(el('stop', { offset: '0', 'stop-color': color, 'stop-opacity': '.25' }));
+        lg.appendChild(el('stop', { offset: '1', 'stop-color': color, 'stop-opacity': '0' }));
+        defs.appendChild(lg); svg.appendChild(defs);
+        svg.appendChild(el('path', { d: line + ' L' + x(data.length - 1) + ',' + y(0) + ' L' + x(0) + ',' + y(0) + ' Z', fill: 'url(#' + gid + ')' }));
+      }
+      svg.appendChild(el('path', { d: line, fill: 'none', stroke: color, 'stroke-width': width, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-dasharray': fill ? '0' : '5 5', opacity: fill ? 1 : .8 }));
+      if (fill) data.forEach((v, i) => svg.appendChild(el('circle', { cx: x(i), cy: y(v), r: 2.6, fill: cssVar('var(--surface)'), stroke: color, 'stroke-width': 2 })));
+    }
+    series(d2025, faint, 2, false);
+    series(d2026, cssVar('var(--c1)'), 2.6, true);
+    $('#lg-2026').textContent = 'US$ 1,72 M';
+  })();
+
+  /* ---------- Donut ---------- */
+  (function () {
+    const svg = $('#donut');
+    const data = [
+      { label: 'Básico', val: 42, color: cssVar('var(--c1)') },
+      { label: 'Pro', val: 35, color: cssVar('var(--c2)') },
+      { label: 'Enterprise', val: 23, color: cssVar('var(--c4)') }
+    ];
+    const cx = 100, cy = 100, r = 70, sw = 24, C = 2 * Math.PI * r;
+    svg.appendChild(el('circle', { cx, cy, r, fill: 'none', stroke: cssVar('var(--grid)'), 'stroke-width': sw }));
+    let off = 0;
+    data.forEach((d) => {
+      const len = (d.val / 100) * C;
+      const c = el('circle', { cx, cy, r, fill: 'none', stroke: d.color, 'stroke-width': sw, 'stroke-dasharray': len + ' ' + (C - len), 'stroke-dashoffset': -off, transform: 'rotate(-90 ' + cx + ' ' + cy + ')', 'stroke-linecap': 'butt' });
+      svg.appendChild(c); off += len;
+    });
+    const t1 = el('text', { x: cx, y: cy - 2, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 700, fill: cssVar('var(--text)') });
+    t1.textContent = '12.4K'; svg.appendChild(t1);
+    const t2 = el('text', { x: cx, y: cy + 16, 'text-anchor': 'middle', 'font-size': 11, fill: cssVar('var(--faint)') });
+    t2.textContent = 'cuentas'; svg.appendChild(t2);
+    const lg = $('#donut-legend');
+    data.forEach((d) => {
+      const it = document.createElement('span'); it.className = 'it';
+      it.innerHTML = '<span class="sw" style="background:' + d.color + '"></span>' + d.label + ' <b>' + d.val + '%</b>';
+      lg.appendChild(it);
+    });
+  })();
+
+  /* ---------- Barras por región ---------- */
+  (function () {
+    const regions = [
+      { name: 'Buenos Aires', val: 486, color: 'var(--c1)' },
+      { name: 'Córdoba', val: 312, color: 'var(--c2)' },
+      { name: 'Santa Fe', val: 268, color: 'var(--c4)' },
+      { name: 'Mendoza', val: 154, color: 'var(--c3)' },
+      { name: 'Resto del país', val: 203, color: 'var(--c5)' }
+    ];
+    const max = Math.max(...regions.map((r) => r.val));
+    const wrap = $('#regionBars');
+    regions.forEach((r) => {
+      const row = document.createElement('div'); row.className = 'bar-row';
+      row.innerHTML =
+        '<span class="name">' + r.name + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + (r.val / max * 100).toFixed(1) + '%;background:' + r.color + '"></span></span>' +
+        '<span class="amt">US$ ' + r.val + 'K</span>';
+      wrap.appendChild(row);
+    });
+  })();
+
+  /* ---------- Tabla de datos sensibles (ficticios) ---------- */
+  (function () {
+    const palette = ['var(--c1)', 'var(--c2)', 'var(--c4)', 'var(--c3)', 'var(--c5)'];
+    const rows = [
+      { n: 'Logística Andina S.R.L.', e: 'cobros@logandina.com.ar', cuit: '30-71045328-4', card: '4551', brand: 'Visa', amt: '2.480.000', st: 'ok', stl: 'Al día' },
+      { n: 'Compañía del Plata S.A.', e: 'finanzas@delplata.com', cuit: '30-69874412-9', card: '5218', brand: 'Master', amt: '1.930.500', st: 'ok', stl: 'Al día' },
+      { n: 'AgroSur Exportaciones', e: 'tesoreria@agrosur.com.ar', cuit: '33-70912233-7', card: '3782', brand: 'Amex', amt: '1.645.000', st: 'mid', stl: 'En revisión' },
+      { n: 'TecnoGlobal SRL', e: 'pagos@tecnoglobal.io', cuit: '30-71550098-1', card: '4024', brand: 'Visa', amt: '1.210.750', st: 'risk', stl: 'Impago' },
+      { n: 'Constructora Pireo', e: 'admin@pireo.com.ar', cuit: '30-70338821-5', card: '6011', brand: 'Discover', amt: '988.200', st: 'ok', stl: 'Al día' }
+    ];
+    const body = $('#custBody');
+    rows.forEach((r, i) => {
+      const parts = r.n.split(/\s+/);
+      const ini = ((parts[0][0] || '') + (parts[1] ? parts[1][0] : '')).toUpperCase();
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><div class="cust"><span class="av" style="background:' + palette[i % palette.length] + '">' + ini + '</span>' +
+          '<span class="nm"><b>' + r.n + '</b><span>' + r.e + '</span></span></div></td>' +
+        '<td class="mono">' + r.cuit + '</td>' +
+        '<td class="mono">' + r.brand + ' <span class="mask">•••• ' + r.card + '</span></td>' +
+        '<td class="amt-pos">US$ ' + r.amt + '</td>' +
+        '<td><span class="pill ' + r.st + '">' + r.stl + '</span></td>';
+      body.appendChild(tr);
+    });
+  })();
+</script>
+</body>
+</html>

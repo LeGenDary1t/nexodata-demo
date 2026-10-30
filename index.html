@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexodata · Iniciar sesión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --text: #0b1220;
+    --muted: #5b6678;
+    --placeholder: #9aa4b5;
+    --border: #dde3ec;
+    --input-bg: #ffffff;
+    --hover: #f0f3f9;
+    --primary: #2f55e4;
+    --primary-hover: #2546c4;
+    --ring: rgba(47, 85, 228, .22);
+    --danger: #d23434;
+    --danger-ring: rgba(210, 52, 52, .18);
+    --warn: #b45309;
+    --ok: #0f9f8f;
+    --ok-bg: rgba(18, 181, 165, .12);
+    --badge-bg: rgba(18, 181, 165, .12);
+    --badge-text: #0b7f73;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0f19;
+      --surface: #121826;
+      --text: #e6eaf2;
+      --muted: #94a0b4;
+      --placeholder: #5f6b80;
+      --border: #263147;
+      --input-bg: #0f1522;
+      --hover: #1a2234;
+      --primary: #4c6ef5;
+      --primary-hover: #6080f7;
+      --ring: rgba(76, 110, 245, .35);
+      --danger: #f06a6a;
+      --danger-ring: rgba(240, 106, 106, .25);
+      --warn: #f5b454;
+      --ok: #3fd3c2;
+      --ok-bg: rgba(63, 211, 194, .12);
+      --badge-bg: rgba(63, 211, 194, .12);
+      --badge-text: #5fe0d1;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0f19; --surface: #121826; --text: #e6eaf2; --muted: #94a0b4;
+    --placeholder: #5f6b80; --border: #263147; --input-bg: #0f1522; --hover: #1a2234;
+    --primary: #4c6ef5; --primary-hover: #6080f7; --ring: rgba(76, 110, 245, .35);
+    --danger: #f06a6a; --danger-ring: rgba(240, 106, 106, .25); --warn: #f5b454;
+    --ok: #3fd3c2; --ok-bg: rgba(63, 211, 194, .12);
+    --badge-bg: rgba(63, 211, 194, .12); --badge-text: #5fe0d1;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--primary); text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  /* ---------- Panel de marca ---------- */
+  .brand {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(900px 600px at 10% 5%, rgba(76, 110, 245, .38), transparent 60%),
+      radial-gradient(700px 520px at 95% 95%, rgba(18, 181, 165, .30), transparent 60%),
+      #0a1430;
+    color: #dfe6ff;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 48px;
+  }
+  .net { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .6; pointer-events: none; }
+  .net line { stroke: rgba(150, 175, 255, .2); stroke-width: 1; }
+  .net circle { fill: #8fa6ff; }
+  .net circle.teal { fill: #4fe0cf; }
+  .net circle.pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pulse 3.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: .45; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.7); }
+  }
+  .brand > :not(.net) { position: relative; }
+
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
+  .logo svg { flex: none; }
+  .logo span small { font-weight: 500; opacity: .6; margin-left: 3px; font-size: .85em; }
+
+  .pitch { max-width: 470px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: #7fe3d8; margin-bottom: 16px;
+  }
+  .pitch h2 {
+    font-size: clamp(30px, 3.1vw, 42px);
+    line-height: 1.12; letter-spacing: -.025em;
+    margin: 0 0 16px; color: #fff; font-weight: 700;
+  }
+  .pitch p { margin: 0 0 30px; color: #b4c0e4; font-size: 16px; }
+  .features { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .features li { display: flex; gap: 12px; align-items: center; color: #d6def7; }
+  .features .ic {
+    flex: none; width: 32px; height: 32px; border-radius: 9px;
+    display: grid; place-items: center;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .1);
+    color: #7fe3d8;
+  }
+  .features svg { width: 17px; height: 17px; }
+
+  .stats { display: flex; gap: 36px; flex-wrap: wrap; }
+  .stat strong { display: block; color: #fff; font-size: 22px; letter-spacing: -.02em; }
+  .stat span { font-size: 13px; color: #8d9bc4; }
+
+  /* ---------- Formulario ---------- */
+  .auth {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 16px 24px; gap: 40px;
+  }
+  .card { width: 100%; max-width: 400px; margin-top: auto; }
+  .mobile-logo { display: none; margin-bottom: 28px; color: var(--text); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 600;
+    color: var(--badge-text); background: var(--badge-bg);
+    border-radius: 999px; padding: 4px 11px; margin-bottom: 20px;
+  }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  h1 { font-size: 28px; letter-spacing: -.025em; margin: 0 0 6px; line-height: 1.2; }
+  .sub { margin: 0 0 28px; color: var(--muted); }
+
+  .alert {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px 14px; margin: 0 0 20px;
+    border: 1px solid var(--danger); border-radius: 10px;
+    background: var(--danger-ring); color: var(--danger);
+    font-size: 14px;
+  }
+  .alert[hidden] { display: none; }
+  .alert svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .label-row label { margin: 0; }
+  .label-row a { font-size: 13px; }
+
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-wrap > svg {
+    position: absolute; left: 13px; width: 18px; height: 18px;
+    color: var(--muted); pointer-events: none;
+  }
+  .input-wrap input {
+    width: 100%; height: 46px;
+    padding: 0 14px 0 41px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--input-bg); color: var(--text);
+    font: inherit;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .input-wrap input::placeholder { color: var(--placeholder); }
+  .input-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
+  .field.invalid input { border-color: var(--danger); }
+  .field.invalid input:focus { box-shadow: 0 0 0 4px var(--danger-ring); }
+  #password { padding-right: 48px; }
+
+  .toggle {
+    position: absolute; right: 5px;
+    width: 36px; height: 36px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--muted); cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .toggle:hover { color: var(--text); background: var(--hover); }
+  .toggle:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); }
+  .toggle svg { width: 18px; height: 18px; }
+  .toggle .eye-off { display: none; }
+  .toggle[aria-pressed="true"] .eye { display: none; }
+  .toggle[aria-pressed="true"] .eye-off { display: block; }
+
+  .error { margin: 6px 0 0; font-size: 13px; color: var(--danger); }
+  .error:empty { display: none; }
+  .hint { margin: 6px 0 0; font-size: 13px; color: var(--warn); }
+
+  .check {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 400; font-size: 14px; color: var(--muted);
+    margin: 4px 0 24px; cursor: pointer; user-select: none; width: fit-content;
+  }
+  .check input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
+
+  .btn {
+    width: 100%; height: 46px; border-radius: 10px;
+    font: inherit; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .15s, border-color .15s, transform .05s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn.primary {
+    border: 0; background: var(--primary); color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 6px 16px var(--ring);
+  }
+  .btn.primary:hover { background: var(--primary-hover); }
+  .btn.secondary { border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+  .btn.secondary:hover { background: var(--hover); }
+  .btn[disabled] { cursor: progress; opacity: .85; }
+
+  .spinner {
+    display: none; width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff;
+    animation: spin .7s linear infinite;
+  }
+  .btn.loading .spinner { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; margin: 22px 0; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  .foot { text-align: center; color: var(--muted); font-size: 14px; margin: 26px 0 0; }
+
+  .success { text-align: center; padding: 12px 0; }
+  .success .ok {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: grid; place-items: center; margin: 0 auto 20px;
+    background: var(--ok-bg); color: var(--ok);
+  }
+  .success .ok svg { width: 30px; height: 30px; }
+  .success p { color: var(--muted); margin: 0 0 28px; overflow-wrap: anywhere; }
+  .success strong { color: var(--text); }
+
+  .page-foot {
+    margin-top: auto;
+    font-size: 12.5px; color: var(--muted);
+    display: flex; gap: 6px 18px; flex-wrap: wrap; justify-content: center;
+  }
+  .page-foot a { color: var(--muted); font-weight: 400; }
+
+  .shake { animation: shake .4s; }
+  @keyframes shake {
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px;
+    transform: translate(-50%, 16px); opacity: 0;
+    background: #0f172a; color: #fff;
+    padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none; max-width: calc(100% - 32px); text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .brand { display: none; }
+    .mobile-logo { display: flex; }
+    .auth { padding-top: 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Definiciones compartidas del logo -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="nx-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4c6ef5"/>
+      <stop offset="1" stop-color="#12b5a5"/>
+    </linearGradient>
+  </defs>
+  <symbol id="nx-logo" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="8" fill="url(#nx-grad)"/>
+    <path d="M10 22V10l12 12V10" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="10" cy="22" r="2.6" fill="#fff"/>
+    <circle cx="10" cy="10" r="2.6" fill="#fff"/>
+    <circle cx="22" cy="22" r="2.6" fill="#fff"/>
+    <circle cx="22" cy="10" r="2.6" fill="#fff"/>
+  </symbol>
+</svg>
+
+<div class="layout">
+  <aside class="brand" aria-hidden="false">
+    <svg class="net" id="net" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+
+    <div class="logo">
+      <svg width="34" height="34" aria-hidden="true"><use href="#nx-logo"/></svg>
+      <span>Nexodata<small>S.A.</small></span>
+    </div>
+
+    <div class="pitch">
+      <span class="eyebrow">Plataforma de datos</span>
+      <h2>Todos tus datos, conectados en un solo lugar.</h2>
+      <p>Integrá, analizá y compartí información de toda tu organización con la seguridad que tu equipo necesita.</p>
+      <ul class="features">
+        <li>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-12 0V8z"/><path d="M12 17v5"/></svg></span>
+          Más de 150 integraciones listas para usar
+        </li>
+        <li>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg></span>
+          Tableros e informes en tiempo real
+        </li>
+        <li>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          Cifrado de extremo a extremo y control de accesos
+        </li>
+      </ul>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><strong>1.200+</strong><span>empresas clientes</span></div>
+      <div class="stat"><strong>99,9 %</strong><span>disponibilidad</span></div>
+      <div class="stat"><strong>24/7</strong><span>soporte técnico</span></div>
+    </div>
+  </aside>
+
+  <main class="auth">
+    <div class="card">
+      <div class="logo mobile-logo">
+        <svg width="34" height="34" aria-hidden="true"><use href="#nx-logo"/></svg>
+        <span>Nexodata<small>S.A.</small></span>
+      </div>
+
+      <span class="badge">Entorno de demostración</span>
+
+      <section id="form-view">
+        <h1>Iniciar sesión</h1>
+        <p class="sub">Ingresá con tu cuenta corporativa para acceder al panel.</p>
+
+        <div class="alert" id="auth-error" role="alert" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Correo o contraseña incorrectos. Revisá los datos e intentá de nuevo.</span>
+        </div>
+
+        <form id="login" novalidate>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="username"
+                     placeholder="nombre@empresa.com" aria-describedby="email-error" required>
+            </div>
+            <p class="error" id="email-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="password">Contraseña</label>
+              <a href="#" data-demo="Te enviaríamos un enlace para restablecer tu contraseña.">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <input id="password" name="password" type="password" autocomplete="current-password"
+                     placeholder="••••••••" aria-describedby="password-error caps" required>
+              <button type="button" class="toggle" id="toggle" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="m2 2 20 20"/></svg>
+              </button>
+            </div>
+            <p class="hint" id="caps" hidden>Bloq Mayús está activado.</p>
+            <p class="error" id="password-error" aria-live="polite"></p>
+          </div>
+
+          <label class="check">
+            <input type="checkbox" id="remember">
+            <span>Recordar mi correo</span>
+          </label>
+
+          <button type="submit" class="btn primary" id="submit">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="label">Ingresar</span>
+          </button>
+        </form>
+
+        <div class="divider">o</div>
+
+        <button type="button" class="btn secondary" data-demo="Redirigiendo a tu proveedor de identidad corporativo…">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/><path d="M10 21v-3h4v3"/></svg>
+          Ingresar con SSO corporativo
+        </button>
+
+        <p class="foot">¿No tenés cuenta? <a href="#" id="go-register">Solicitá acceso</a></p>
+      </section>
+
+      <section id="register-view" hidden>
+        <h1>Crear cuenta</h1>
+        <p class="sub">Registrá una cuenta de demostración para acceder al panel.</p>
+
+        <form id="register" novalidate>
+          <div class="field">
+            <label for="r-name">Nombre y apellido</label>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <input id="r-name" name="name" type="text" autocomplete="name"
+                     placeholder="Ej.: Leila Laureiro" aria-describedby="r-name-error" required>
+            </div>
+            <p class="error" id="r-name-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="r-email">Correo electrónico</label>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              <input id="r-email" name="email" type="email" inputmode="email" autocomplete="email"
+                     placeholder="nombre@empresa.com" aria-describedby="r-email-error" required>
+            </div>
+            <p class="error" id="r-email-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="r-password">Contraseña</label>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <input id="r-password" name="password" type="password" autocomplete="new-password"
+                     placeholder="Mínimo 6 caracteres" aria-describedby="r-password-error" required>
+              <button type="button" class="toggle" id="r-toggle" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="m2 2 20 20"/></svg>
+              </button>
+            </div>
+            <p class="error" id="r-password-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="r-confirm">Repetir contraseña</label>
+            <div class="input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <input id="r-confirm" name="confirm" type="password" autocomplete="new-password"
+                     placeholder="Repetí la contraseña" aria-describedby="r-confirm-error" required>
+            </div>
+            <p class="error" id="r-confirm-error" aria-live="polite"></p>
+          </div>
+
+          <button type="submit" class="btn primary" id="r-submit">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="label">Crear cuenta</span>
+          </button>
+        </form>
+
+        <p class="foot">¿Ya tenés cuenta? <a href="#" id="go-login">Iniciar sesión</a></p>
+      </section>
+    </div>
+
+    <footer class="page-foot">
+      <span>© 2026 Nexodata S.A.</span>
+      <a href="#" data-demo="Política de privacidad (demo).">Privacidad</a>
+      <a href="#" data-demo="Términos y condiciones (demo).">Términos</a>
+      <a href="#" data-demo="Centro de ayuda (demo).">Ayuda</a>
+    </footer>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // Página de demostración: no envía datos a ningún servidor.
+  const $ = (s) => document.querySelector(s);
+  const form = $('#login');
+  const email = $('#email');
+  const pass = $('#password');
+  const submit = $('#submit');
+  const remember = $('#remember');
+  const REMEMBER_KEY = 'nexodata.email';
+  const authError = $('#auth-error');
+
+  // Usuarios de demostración. En un sistema real las credenciales se validan en el servidor.
+  const SEED_USERS = [
+    { email: 'leilalaureiro@corpnexodata.com', password: 'maxi123', name: 'Leila Laureiro' }
+  ];
+  const USERS_KEY = 'nexodata.users';
+
+  // Lee los usuarios registrados (guardados en este navegador) y los suma a los de base.
+  function storedUsers() {
+    try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
+    catch (_) { return []; }
+  }
+  function allUsers() { return SEED_USERS.concat(storedUsers()); }
+  function emailTaken(mail) {
+    return allUsers().some((u) => u.email === mail.trim().toLowerCase());
+  }
+  function saveUser(user) {
+    const list = storedUsers();
+    list.push(user);
+    try { localStorage.setItem(USERS_KEY, JSON.stringify(list)); } catch (_) {}
+  }
+
+  // Red de nodos decorativa del panel de marca
+  (function drawNetwork() {
+    const svg = $('#net');
+    const NS = 'http://www.w3.org/2000/svg';
+    const nodes = [
+      [60, 90], [190, 150], [320, 70], [470, 130], [570, 250], [400, 250],
+      [250, 290], [110, 340], [40, 520], [200, 470], [350, 420], [500, 430],
+      [575, 600], [420, 580], [270, 620], [120, 680], [330, 760], [520, 740]
+    ];
+    nodes.forEach((a, i) => nodes.slice(i + 1).forEach((b) => {
+      if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 200) {
+        const l = document.createElementNS(NS, 'line');
+        l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]);
+        l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
+        svg.appendChild(l);
+      }
+    }));
+    nodes.forEach(([x, y], i) => {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      c.setAttribute('r', i % 3 === 0 ? 4 : 2.5);
+      if (i % 3 === 0) { c.classList.add('pulse'); c.style.animationDelay = (i * 0.41) + 's'; }
+      if (i % 4 === 1) c.classList.add('teal');
+      svg.appendChild(c);
+    });
+  })();
+
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  document.querySelectorAll('[data-demo]').forEach((el) =>
+    el.addEventListener('click', (e) => { e.preventDefault(); toast(el.dataset.demo); })
+  );
+
+  function setError(input, msg) {
+    const field = input.closest('.field');
+    field.classList.toggle('invalid', !!msg);
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    field.querySelector('.error').textContent = msg || '';
+    return !msg;
+  }
+
+  function validateEmail() {
+    const v = email.value.trim();
+    if (!v) return setError(email, 'Ingresá tu correo electrónico.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return setError(email, 'El formato del correo no es válido.');
+    return setError(email, '');
+  }
+
+  function validatePass() {
+    if (!pass.value) return setError(pass, 'Ingresá tu contraseña.');
+    return setError(pass, '');
+  }
+
+  // Revalida en vivo solo los campos que ya marcaron error
+  email.addEventListener('input', () => { if (email.closest('.field').classList.contains('invalid')) validateEmail(); });
+  pass.addEventListener('input', () => { if (pass.closest('.field').classList.contains('invalid')) validatePass(); });
+  [email, pass].forEach((i) => i.addEventListener('input', () => { authError.hidden = true; }));
+
+  function shake() {
+    form.classList.remove('shake');
+    void form.offsetWidth;
+    form.classList.add('shake');
+  }
+
+  $('#toggle').addEventListener('click', function () {
+    const show = pass.type === 'password';
+    pass.type = show ? 'text' : 'password';
+    this.setAttribute('aria-pressed', String(show));
+    this.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    pass.focus();
+  });
+
+  const capsHint = $('#caps');
+  ['keydown', 'keyup'].forEach((ev) => pass.addEventListener(ev, (e) => {
+    capsHint.hidden = !(e.getModifierState && e.getModifierState('CapsLock'));
+  }));
+  pass.addEventListener('blur', () => { capsHint.hidden = true; });
+
+  try {
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) { email.value = saved; remember.checked = true; }
+  } catch (_) {}
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ok = [validateEmail(), validatePass()].every(Boolean);
+    authError.hidden = true;
+    if (!ok) {
+      shake();
+      form.querySelector('.invalid input').focus();
+      return;
+    }
+
+    submit.disabled = true;
+    submit.classList.add('loading');
+    submit.querySelector('.label').textContent = 'Verificando…';
+
+    setTimeout(() => {
+      submit.disabled = false;
+      submit.classList.remove('loading');
+      submit.querySelector('.label').textContent = 'Ingresar';
+
+      const user = allUsers().find((u) =>
+        u.email === email.value.trim().toLowerCase() && u.password === pass.value
+      );
+      if (!user) {
+        authError.hidden = false;
+        pass.value = '';
+        shake();
+        pass.focus();
+        return;
+      }
+
+      try {
+        if (remember.checked) localStorage.setItem(REMEMBER_KEY, user.email);
+        else localStorage.removeItem(REMEMBER_KEY);
+      } catch (_) {}
+
+      pass.value = '';
+      // Demo educativa: el ingreso abre el panel administrativo simulado.
+      window.location.href = 'panel.html?u=' + encodeURIComponent(user.name);
+    }, 1200);
+  });
+
+  /* ---------- Registro ---------- */
+  const loginView = $('#form-view');
+  const registerView = $('#register-view');
+  const regForm = $('#register');
+  const rName = $('#r-name');
+  const rEmail = $('#r-email');
+  const rPass = $('#r-password');
+  const rConfirm = $('#r-confirm');
+  const rSubmit = $('#r-submit');
+
+  function showView(which) {
+    const toRegister = which === 'register';
+    loginView.hidden = toRegister;
+    registerView.hidden = !toRegister;
+    authError.hidden = true;
+    (toRegister ? rName : email).focus();
+  }
+
+  $('#go-register').addEventListener('click', (e) => { e.preventDefault(); showView('register'); });
+  $('#go-login').addEventListener('click', (e) => { e.preventDefault(); showView('login'); });
+
+  $('#r-toggle').addEventListener('click', function () {
+    const show = rPass.type === 'password';
+    rPass.type = rConfirm.type = show ? 'text' : 'password';
+    this.setAttribute('aria-pressed', String(show));
+    this.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    rPass.focus();
+  });
+
+  function validateRName() {
+    return setError(rName, rName.value.trim() ? '' : 'Ingresá tu nombre y apellido.');
+  }
+  function validateREmail() {
+    const v = rEmail.value.trim();
+    if (!v) return setError(rEmail, 'Ingresá un correo electrónico.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return setError(rEmail, 'El formato del correo no es válido.');
+    if (emailTaken(v)) return setError(rEmail, 'Ya existe una cuenta con ese correo.');
+    return setError(rEmail, '');
+  }
+  function validateRPass() {
+    if (!rPass.value) return setError(rPass, 'Creá una contraseña.');
+    if (rPass.value.length < 6) return setError(rPass, 'La contraseña debe tener al menos 6 caracteres.');
+    return setError(rPass, '');
+  }
+  function validateRConfirm() {
+    if (!rConfirm.value) return setError(rConfirm, 'Repetí la contraseña.');
+    if (rConfirm.value !== rPass.value) return setError(rConfirm, 'Las contraseñas no coinciden.');
+    return setError(rConfirm, '');
+  }
+
+  function revalidate(i) {
+    if (i === rName) validateRName();
+    else if (i === rEmail) validateREmail();
+    else if (i === rPass) validateRPass();
+    else if (i === rConfirm) validateRConfirm();
+  }
+  // Revalida en vivo solo los campos que ya marcaron error.
+  [rName, rEmail, rPass, rConfirm].forEach((i) =>
+    i.addEventListener('input', () => { if (i.closest('.field').classList.contains('invalid')) revalidate(i); })
+  );
+
+  regForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ok = [validateRName(), validateREmail(), validateRPass(), validateRConfirm()].every(Boolean);
+    if (!ok) {
+      regForm.classList.remove('shake');
+      void regForm.offsetWidth;
+      regForm.classList.add('shake');
+      regForm.querySelector('.invalid input').focus();
+      return;
+    }
+
+    rSubmit.disabled = true;
+    rSubmit.classList.add('loading');
+    rSubmit.querySelector('.label').textContent = 'Creando cuenta…';
+
+    setTimeout(() => {
+      saveUser({
+        name: rName.value.trim(),
+        email: rEmail.value.trim().toLowerCase(),
+        password: rPass.value
+      });
+
+      rSubmit.disabled = false;
+      rSubmit.classList.remove('loading');
+      rSubmit.querySelector('.label').textContent = 'Crear cuenta';
+
+      // Prellena el correo en el login y vuelve a la pantalla de ingreso.
+      email.value = rEmail.value.trim().toLowerCase();
+      pass.value = '';
+      regForm.reset();
+      showView('login');
+      toast('Cuenta creada. Ya podés iniciar sesión.');
+      pass.focus();
+    }, 1000);
+  });
+</script>
+</body>
+</html>
